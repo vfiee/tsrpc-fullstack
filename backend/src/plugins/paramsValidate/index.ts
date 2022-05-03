@@ -1,7 +1,7 @@
 /*
  * @Author: vyron
  * @Date: 2022-05-01 18:40:06
- * @LastEditTime: 2022-05-03 21:19:38
+ * @LastEditTime: 2022-05-03 23:06:47
  * @LastEditors: vyron
  * @Description: TSRPC验证请求参数插件
  * @FilePath: /tsrpc-app/backend/src/plugins/paramsValidate/index.ts
@@ -16,7 +16,7 @@ import {
   toRawType,
   isRegExp
 } from '@j-utils/type'
-import { HttpServerWithPlugin, TsRpcPluginFn } from '..'
+import { HttpServerWithPlugin, TsRpcPlugin } from '..'
 import {
   BaseConf,
   Validator,
@@ -24,25 +24,22 @@ import {
   ParamsValidateRule
 } from '@Protocols/base/io/conf'
 
-export type ValidateParamsSuccess = null
+export type ValidateSuccess = null
 
-export type ValidateParamsFailed = {
+export type ValidateFailed = {
   code: number
   message: string
 }
 
-export type ValidateParamsResult = Promise<
-  [boolean, ValidateParamsSuccess | ValidateParamsFailed]
+export type ValidateResult = Promise<
+  [boolean, ValidateSuccess | ValidateFailed]
 >
 
 export type Validators = {
   [key in keyof Omit<ValidateRule, 'message'> as string]: Validator
 }
 
-const validate = async (
-  value: any,
-  rule: ValidateRule
-): ValidateParamsResult => {
+const validate = async (value: any, rule: ValidateRule): ValidateResult => {
   const { type, min, max, pattern, validator, message } = rule
   const validators: Validators = {
     validator: (value) => isFunction(validator) && validator!(value),
@@ -63,12 +60,12 @@ const validate = async (
   return [true, null]
 }
 
-const validateSingleParams = async <T extends any>(
-  req: T,
+const validateSingleParams = async (
+  req: any,
   rule: ParamsValidateRule
-): ValidateParamsResult => {
+): ValidateResult => {
   const { key, rules } = rule
-  const value = (req as any)[key]
+  const value = req[key]
   if (isNil(value)) return [false, { code: 400, message: `${key} is required` }]
   if (isArray(rules)) {
     if (rules.length === 1) return validate(value, rules[0])
@@ -83,10 +80,10 @@ const validateSingleParams = async <T extends any>(
   return validate(value, rules)
 }
 
-const validateMultipleParams = async <T extends any>(
-  req: T,
+const validateMultipleParams = async (
+  req: any,
   rules: ParamsValidateRule[]
-): ValidateParamsResult => {
+): ValidateResult => {
   for (let i = 0; i < rules.length; i++) {
     let [isPass, data] = await validateSingleParams(req, rules[i])
     if (!isPass) return [isPass, data]
@@ -94,7 +91,7 @@ const validateMultipleParams = async <T extends any>(
   return [true, null]
 }
 
-const validateParams = (call: ApiCall<any, any, any>): ValidateParamsResult => {
+const validateParams = (call: ApiCall): ValidateResult => {
   const { req, service: { conf } = {} } = call
   let { paramsValidateRule } = (conf ?? {}) as BaseConf
   if (isEmpty(req) || isEmpty(paramsValidateRule))
@@ -107,15 +104,15 @@ const validateParams = (call: ApiCall<any, any, any>): ValidateParamsResult => {
   return validateSingleParams(req, paramsValidateRule as ParamsValidateRule)
 }
 
-export const paramsValidatePlugin: TsRpcPluginFn = (
+export const paramsValidatePlugin: TsRpcPlugin = (
   server: HttpServerWithPlugin
 ) => {
-  server.flows.preApiCallFlow.push(async (call: ApiCall<any, any, any>) => {
-    const { paramsValidateRule } = call.service.conf ?? {}
+  server.flows.preApiCallFlow.push(async (call: ApiCall) => {
+    const { paramsValidateRule } = (call.service.conf ?? {}) as BaseConf
     if (isEmpty(paramsValidateRule)) return call
     const [isPass, data] = await validateParams(call)
     if (isPass) return call
-    const { code, message } = data as ValidateParamsFailed
+    const { code, message } = data as ValidateFailed
     call.error({
       code,
       message,

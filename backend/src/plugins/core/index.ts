@@ -1,7 +1,7 @@
 /*
  * @Author: vyron
  * @Date: 2022-05-01 18:40:01
- * @LastEditTime: 2022-05-03 21:42:03
+ * @LastEditTime: 2022-05-03 22:37:25
  * @LastEditors: vyron
  * @Description: TSRPC插件
  * @FilePath: /tsrpc-app/backend/src/plugins/core/index.ts
@@ -10,16 +10,16 @@ import { isArray } from '@j-utils/type'
 import { ServiceType } from '@Protocols'
 import { HttpServer, ServiceProto, HttpServerOptions } from 'tsrpc'
 
-export type TsRpcPluginFn = (server: HttpServerWithPlugin) => void
+export type TsRpcPlugin = (server: HttpServerWithPlugin) => void
 
-export class TsRpcPlugin {
-  private plugins: Set<TsRpcPluginFn>
+export class TsRpcPlugins {
+  private plugins: Set<TsRpcPlugin>
   private server: HttpServerWithPlugin
   constructor(server: HttpServerWithPlugin) {
     this.server = server
     this.plugins = new Set()
   }
-  use(plugins: TsRpcPluginFn | TsRpcPluginFn[]): TsRpcPlugin {
+  use(plugins: TsRpcPlugin | TsRpcPlugin[]): TsRpcPlugins {
     if (isArray(plugins)) {
       plugins.forEach(this.register)
     } else {
@@ -27,7 +27,7 @@ export class TsRpcPlugin {
     }
     return this
   }
-  private register(plugin: TsRpcPluginFn): TsRpcPlugin {
+  private register(plugin: TsRpcPlugin): TsRpcPlugins {
     if (this.plugins.has(plugin)) {
       console.warn(`[TsRpcPlugin Warn] Plugin already registered!`)
       return this
@@ -39,12 +39,12 @@ export class TsRpcPlugin {
 }
 
 export class HttpServerWithPlugin extends HttpServer {
-  plugins: TsRpcPlugin
+  plugins: TsRpcPlugins
   constructor(
     proto: ServiceProto<ServiceType>,
     options?: Partial<HttpServerOptions<ServiceType>>
   ) {
     super(proto, options)
-    this.plugins = new TsRpcPlugin(this)
+    this.plugins = new TsRpcPlugins(this)
   }
 }

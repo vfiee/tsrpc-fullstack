@@ -5,7 +5,7 @@ import { HttpServerWithPlugin, paramsValidatePlugin } from '@Plugins'
 
 // Create the Server
 const server = new HttpServerWithPlugin(serviceProto, {
-  port: 3000,
+  port: process.env.PORT ? Number(process.env.PORT) : 3000,
   // Remove this to use binary mode (remove from the client too)
   json: true,
   cors: '*'
