@@ -2,49 +2,48 @@
   <div class="App">
     <h1>TSRPC Guestbook</h1>
 
-    <div class="send">
-      <textarea placeholder="Say something..." v-model="input" />
-      <button v-on:click="send">Send</button>
-    </div>
-
-    <ul class="list">
-      <li v-for="(v, i) in list" v-bind:key="i">
-        <div class="content">{{ v.content }}</div>
-        <div class="time">{{ v.time.toLocaleTimeString() }}</div>
-      </li>
-    </ul>
+    <div @click="createUser">创建用户</div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { client } from "./client";
-// import { ResGetData } from "./shared/protocols/PtlGetData";
-
-export interface AppData {
-  input: string;
-  // list: ResGetData["data"];
-}
+import { ApiReturn } from 'tsrpc-proto'
+import { defineComponent } from 'vue'
+import { client } from './client'
+import {
+  ResCreateUser,
+  ReqCreateUser
+} from './shared/protocols/user/PtlCreateUser'
 
 export default defineComponent({
-  name: "App",
+  name: 'App',
   data() {
-    return {
-      input: "",
-      list: [],
-    } as AppData;
+    return {}
   },
 
   methods: {
+    async createUser() {
+      const req: ReqCreateUser = {
+        name: '姜威朋',
+        nickname: 'vyron',
+        password: '123456',
+        avatar: '',
+        sex: 0,
+        phone: '1551615032'
+      }
+      const res: ApiReturn<ResCreateUser> = await client.callApi(
+        'user/CreateUser',
+        req
+      )
+      console.log(`res:`, res)
+    },
     async loadList() {
       // let ret = await client.callApi("GetData", {});
-
       // // Error
       // if (!ret.isSucc) {
       //   alert(ret.err.message);
       //   return;
       // }
-
       // // Success
       // this.list = ret.res.data;
     },
@@ -53,25 +52,23 @@ export default defineComponent({
       // let ret = await client.callApi("AddData", {
       //   content: this.input,
       // });
-
       // // Error
       // if (!ret.isSucc) {
       //   alert(ret.err.message);
       //   return;
       // }
-
       // // Success
       // this.input = "";
       // this.loadList();
-    },
+    }
   },
 
   mounted() {
-    this.loadList();
-  },
-});
+    this.loadList()
+  }
+})
 </script>
 
 <style lang="less">
-@import "./App.less";
+@import './App.less';
 </style>

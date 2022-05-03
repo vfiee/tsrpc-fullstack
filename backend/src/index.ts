@@ -1,24 +1,26 @@
-import * as path from 'path'
-import { HttpServer } from 'tsrpc'
-import { serviceProto } from './shared/protocols/serviceProto'
-import { Global } from './global'
+import { resolve } from 'path'
+import { MongoDb } from '@Services'
+import { serviceProto } from '@Protocols'
+import { HttpServerWithPlugin, paramsValidatePlugin } from '@Plugins'
 
 // Create the Server
-const server = new HttpServer(serviceProto, {
+const server = new HttpServerWithPlugin(serviceProto, {
   port: 3000,
   // Remove this to use binary mode (remove from the client too)
-  json: true
+  json: true,
+  cors: '*'
 })
+
+server.plugins.use(paramsValidatePlugin)
 
 // Initialize before server start
 async function init() {
   // Auto implement APIs
-  await server.autoImplementApi(path.resolve(__dirname, 'api'))
+  await server.autoImplementApi(resolve(__dirname, 'api'))
 
-  await Global.initDb()
+  await MongoDb.init(server.logger)
 }
 
-// Entry function
 async function main() {
   await init()
   await server.start()

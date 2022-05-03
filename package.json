@@ -5,10 +5,13 @@
   "description": "tsrpc fullstack project",
   "scripts": {
     "dev": "run-p backend frontend",
-    "backend": "cd backend && npm run dev",
-    "frontend": "cd frontend && npm run dev",
-    "test": "pnpm run test",
-    "preinstall": "npx only-allow pnpm"
+    "backend": "cd backend && yarn dev",
+    "frontend": "cd frontend && yarn dev",
+    "test": "yarn test",
+    "ia": "run-p install:backend install:frontend",
+    "install:backend": "cd backend && yarn install",
+    "install:frontend": "cd frontend && yarn install",
+    "preinstall": "npx only-allow yarn"
   },
   "keywords": [
     "fullstack",
@@ -19,5 +22,8 @@
   "license": "MIT",
   "devDependencies": {
     "npm-run-all": "^4.1.5"
+  },
+  "dependencies": {
+    "tsrpc": "^3.3.0"
   }
 }

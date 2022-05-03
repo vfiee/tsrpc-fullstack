@@ -7,12 +7,48 @@
     "target": "es2018",
     "outDir": "dist",
     "strict": true,
+    "baseUrl": ".",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "@Api/*": [
+        "src/api/*"
+      ],
+      "@Plugins": [
+        "src/plugins/index.ts"
+      ],
+      "@Plugins/*": [
+        "src/plugins/*"
+      ],
+      "@Services": [
+        "src/services/index.ts"
+      ],
+      "@Services/*": [
+        "src/services/*"
+      ],
+      "@Shared": [
+        "src/shared/index.ts"
+      ],
+      "@Shared/*": [
+        "src/shared/*"
+      ],
+      "@Protocols": [
+        "src/shared/protocols/serviceProto.ts"
+      ],
+      "@Protocols/*": [
+        "src/shared/protocols/*"
+      ],
+    }
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }
