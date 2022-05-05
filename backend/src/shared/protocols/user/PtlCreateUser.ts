@@ -5,14 +5,16 @@ import { DbUser } from '../base/mongo/user'
 
 export interface ReqCreateUser extends BaseRequest, Omit<DbUser, '_id' | ''> {}
 
-export interface ResCreateUser extends BaseResponse, DbUser {}
+export interface ResCreateUser extends BaseResponse {
+  data: DbUser
+}
 
 export const conf: BaseConf = {
   paramsValidateRule: {
     key: 'phone',
     rules: [
       {
-        pattern: /^1\d{10}$/,
+        pattern: '^1\\d{10}$',
         message: '请输入正确的手机号'
       }
     ]

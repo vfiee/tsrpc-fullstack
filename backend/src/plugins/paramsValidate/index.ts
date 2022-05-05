@@ -1,7 +1,7 @@
 /*
  * @Author: vyron
  * @Date: 2022-05-01 18:40:06
- * @LastEditTime: 2022-05-03 23:06:47
+ * @LastEditTime: 2022-05-05 17:16:15
  * @LastEditors: vyron
  * @Description: TSRPC验证请求参数插件
  * @FilePath: /tsrpc-app/backend/src/plugins/paramsValidate/index.ts
@@ -12,9 +12,9 @@ import {
   isEmpty,
   isFunction,
   isNil,
-  isNumber,
   toRawType,
-  isRegExp
+  isRegExp,
+  isString
 } from '@j-utils/type'
 import { HttpServerWithPlugin, TsRpcPlugin } from '..'
 import {
@@ -44,9 +44,12 @@ const validate = async (value: any, rule: ValidateRule): ValidateResult => {
   const validators: Validators = {
     validator: (value) => isFunction(validator) && validator!(value),
     type: (value: unknown) => toRawType(value) === type,
-    min: (value: unknown) => isNumber(value) && value >= (min as number),
-    max: (value: unknown) => isNumber(value) && value <= (max as number),
-    pattern: (value: any) => isRegExp(pattern) && pattern.test(value.toString())
+    min: (value: unknown) => isString(value) && value.length >= (min as number),
+    max: (value: unknown) => isString(value) && value.length <= (max as number),
+    pattern: (value: any) => {
+      const reg = isRegExp(pattern) ? pattern : new RegExp(pattern as unknown as string)
+      return reg.test(value.toString())
+    }
   }
   const validateTypes = Object.keys(validators).filter(
     (type) => !isNil(rule[type as keyof Omit<ValidateRule, 'message'>])

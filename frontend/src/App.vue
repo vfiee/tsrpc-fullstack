@@ -29,7 +29,7 @@ export default defineComponent({
         password: '123456',
         avatar: '',
         sex: 0,
-        phone: '1551615032'
+        phone: '15516150323'
       }
       const res: ApiReturn<ResCreateUser> = await client.callApi(
         'user/CreateUser',
