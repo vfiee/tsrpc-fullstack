@@ -1,7 +1,7 @@
 /*
  * @Author: vyron
  * @Date: 2022-04-27 17:25:57
- * @LastEditTime: 2022-05-03 21:19:59
+ * @LastEditTime: 2022-05-05 09:02:14
  * @LastEditors: vyron
  * @Description: 创建用户
  * @FilePath: /tsrpc-app/backend/src/api/user/ApiCreateUser.ts
@@ -9,8 +9,8 @@
 
 import { ApiCall } from 'tsrpc'
 import { ObjectId } from 'mongodb'
-import { MongoDb } from '@Services'
-import { ReqCreateUser, ResCreateUser } from '@Protocols/user/PtlCreateUser'
+import { MongoDb } from '../../services'
+import { ReqCreateUser, ResCreateUser } from '../../shared/protocols/user/PtlCreateUser'
 
 export async function ApiCreateUser(
   call: ApiCall<ReqCreateUser, ResCreateUser>

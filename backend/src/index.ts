@@ -1,7 +1,7 @@
 import { resolve } from 'path'
-import { MongoDb } from '@Services'
-import { serviceProto } from '@Protocols'
-import { HttpServerWithPlugin, paramsValidatePlugin } from '@Plugins'
+import { MongoDb } from './services'
+import { serviceProto } from './shared/protocols/serviceProto'
+import { HttpServerWithPlugin, paramsValidatePlugin } from './plugins'
 
 // Create the Server
 const server = new HttpServerWithPlugin(serviceProto, {
