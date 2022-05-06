@@ -1,26 +1,37 @@
 /*
  * @Author: vyron
  * @Date: 2022-04-28 12:34:06
- * @LastEditTime: 2022-05-05 16:55:36
+ * @LastEditTime: 2022-05-05 22:15:55
  * @LastEditors: vyron
  * @Description: 响应基础类型
  * @FilePath: /tsrpc-app/backend/src/shared/protocols/base/io/response/index.ts
  */
-export declare interface ResponseData {}
 
-export declare interface ResponseList {
+import { Cookie } from '../cookie'
+
+export declare interface DataResponse {}
+
+export declare interface ListResponse {
   pageIndex: number
   pageSize: number
   total: number
   list: any[]
 }
 
-export declare type EmptyResponseData = null
+export declare type EmptyResponse = null
 
-export declare interface BaseResponse {
+export declare interface BaseResponse<T = EmptyResponse> {
   code: ResponseStatus
-  message?: ResponseMessage
-  data: ResponseData | ResponseList | EmptyResponseData
+  message?: ResponseMessage | string
+  data: T | ListResponse | DataResponse
+  [key: string]: any
+}
+
+export declare interface BaseResponseWithCookie<T = EmptyResponse>
+  extends Cookie {
+  code: ResponseStatus
+  message?: ResponseMessage | string
+  data: T | ListResponse | DataResponse
   [key: string]: any
 }
 
@@ -40,16 +51,16 @@ export enum ResponseMessage {
   NoAuth = '无权限访问'
 }
 
-type ResponseWithCodeAndMessage = Pick<BaseResponse, 'code' | 'message'>
-
-export const SuccessResponse: ResponseWithCodeAndMessage = {
+export const SuccessResponse: BaseResponse = {
   code: ResponseStatus.Success,
-  message: ResponseMessage.Success
+  message: ResponseMessage.Success,
+  data: null
 }
 
-export const FailedResponse: ResponseWithCodeAndMessage = {
+export const FailedResponse: BaseResponse = {
   code: ResponseStatus.Failed,
-  message: ResponseMessage.Failed
+  message: ResponseMessage.Failed,
+  data: null
 }
 
 export const NoLoginResponse: BaseResponse = {
